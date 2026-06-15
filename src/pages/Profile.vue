@@ -55,11 +55,61 @@
       </div>
       <EmptyState v-else title="还没有发布物品" description="发布一件闲置后会出现在这里" mark="物" />
     </section>
+
+    <section class="notif-section">
+      <div class="notif-header">
+        <h2>站内消息</h2>
+        <button v-if="unreadNotifs.length" class="secondary-button" type="button" @click="markAllRead">
+          全部已读
+        </button>
+      </div>
+
+      <div v-if="unreadNotifs.length" class="notif-group">
+        <p class="notif-group-label">未读</p>
+        <div
+          v-for="notif in unreadNotifs"
+          :key="notif.id"
+          class="notif-item notif-item--unread"
+          @click="handleNotifClick(notif)"
+        >
+          <span class="notif-dot" />
+          <div class="notif-content">
+            <strong>{{ notif.title }}</strong>
+            <p>{{ notif.body }}</p>
+            <small>{{ formatDate(notif.created_at) }}</small>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="readNotifs.length" class="notif-group">
+        <p class="notif-group-label">已读</p>
+        <div
+          v-for="notif in readNotifs"
+          :key="notif.id"
+          class="notif-item"
+          @click="handleNotifClick(notif)"
+        >
+          <div class="notif-content">
+            <strong>{{ notif.title }}</strong>
+            <p>{{ notif.body }}</p>
+            <small>{{ formatDate(notif.created_at) }}</small>
+          </div>
+        </div>
+      </div>
+
+      <EmptyState
+        v-if="!unreadNotifs.length && !readNotifs.length"
+        title="暂无消息"
+        description="交换状态变化时会在这里收到通知"
+        mark="信"
+      />
+    </section>
   </section>
 </template>
 
 <script setup lang="ts">
 import { computed, reactive, ref, watch, watchEffect } from 'vue';
+import { useRouter } from 'vue-router';
 
 import AvatarUploader from '@/components/common/AvatarUploader.vue';
 import EmptyState from '@/components/common/EmptyState.vue';
@@ -67,10 +117,15 @@ import ItemCard from '@/components/common/ItemCard.vue';
 import UserBrief from '@/components/common/UserBrief.vue';
 import { ItemStatus } from '@/constants/item';
 import { useAuth } from '@/hooks/useAuth';
+import type { Notification } from '@/models/notification';
 import { useItemStore } from '@/stores/itemStore';
+import { useNotificationStore } from '@/stores/notificationStore';
+import { formatDate } from '@/utils/formatters';
 
+const router = useRouter();
 const { currentUser, users, login, updateProfile } = useAuth();
 const itemStore = useItemStore();
+const notificationStore = useNotificationStore();
 const selectedUserId = ref('');
 
 const form = reactive({
@@ -101,6 +156,26 @@ watch(
 
 const myItems = computed(() => (currentUser.value ? itemStore.myItems(currentUser.value.id) : []));
 const availableCount = computed(() => myItems.value.filter((item) => item.status === ItemStatus.AVAILABLE).length);
+
+const unreadNotifs = computed(() =>
+  currentUser.value ? notificationStore.unread(currentUser.value.id) : [],
+);
+const readNotifs = computed(() =>
+  currentUser.value ? notificationStore.read(currentUser.value.id) : [],
+);
+
+const markAllRead = async () => {
+  if (currentUser.value) {
+    await notificationStore.markAllRead(currentUser.value.id);
+  }
+};
+
+const handleNotifClick = async (notif: Notification) => {
+  if (!notif.read) {
+    await notificationStore.markRead(notif.id);
+  }
+  router.push({ name: 'exchanges' });
+};
 
 const save = async () => {
   await updateProfile({ ...form });

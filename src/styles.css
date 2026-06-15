@@ -637,6 +637,104 @@ textarea {
   justify-self: start;
 }
 
+.nav-notif-link {
+  position: relative;
+}
+
+.notif-badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  padding: 0 5px;
+  background: var(--rs-accent);
+  color: #fffaf0;
+  font-size: 0.7rem;
+  font-weight: 800;
+  line-height: 18px;
+  text-align: center;
+}
+
+.notif-section {
+  display: grid;
+  gap: 16px;
+}
+
+.notif-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.notif-header h2 {
+  margin: 0;
+}
+
+.notif-group {
+  display: grid;
+  gap: 8px;
+}
+
+.notif-group-label {
+  margin: 0;
+  color: color-mix(in oklch, var(--rs-text), transparent 40%);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid var(--rs-border);
+  border-radius: 8px;
+  padding: 14px;
+  background: color-mix(in oklch, var(--rs-surface), transparent 1%);
+  cursor: pointer;
+  transition: background 160ms ease;
+}
+
+.notif-item:hover {
+  background: color-mix(in oklch, var(--rs-primary), transparent 92%);
+}
+
+.notif-item--unread {
+  border-color: color-mix(in oklch, var(--rs-accent), transparent 50%);
+  background: color-mix(in oklch, var(--rs-accent), transparent 92%);
+}
+
+.notif-dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--rs-accent);
+}
+
+.notif-content {
+  display: grid;
+  gap: 4px;
+}
+
+.notif-content strong {
+  font-size: 0.95rem;
+}
+
+.notif-content p {
+  margin: 0;
+  color: color-mix(in oklch, var(--rs-text), transparent 30%);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.notif-content small {
+  color: color-mix(in oklch, var(--rs-text), transparent 45%);
+  font-size: 0.78rem;
+}
+
 @media (max-width: 760px) {
   .app-shell {
     width: min(100vw - 20px, 720px);

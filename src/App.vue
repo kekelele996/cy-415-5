@@ -11,7 +11,10 @@
             <RouterLink to="/home">首页</RouterLink>
             <RouterLink to="/publish">发布</RouterLink>
             <RouterLink to="/exchanges">交换</RouterLink>
-            <RouterLink to="/profile">我的</RouterLink>
+            <RouterLink to="/profile" class="nav-notif-link">
+              我的
+              <span v-if="unreadCount > 0" class="notif-badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
+            </RouterLink>
           </nav>
           <button class="theme-toggle" type="button" @click="themeStore.toggle">
             {{ themeStore.token.label }}
@@ -34,17 +37,22 @@ import GlobalErrorBoundary from '@/components/common/GlobalErrorBoundary';
 import { useAuthStore } from '@/stores/authStore';
 import { useExchangeStore } from '@/stores/exchangeStore';
 import { useItemStore } from '@/stores/itemStore';
+import { useNotificationStore } from '@/stores/notificationStore';
 import { useThemeStore } from '@/stores/themeStore';
 import { toVantTheme } from '@/utils/themeUtils';
 
 const authStore = useAuthStore();
 const itemStore = useItemStore();
 const exchangeStore = useExchangeStore();
+const notificationStore = useNotificationStore();
 const themeStore = useThemeStore();
 const vantTheme = computed(() => toVantTheme(themeStore.theme));
+const unreadCount = computed(() =>
+  authStore.currentUser ? notificationStore.unreadCount(authStore.currentUser.id) : 0,
+);
 
 onMounted(async () => {
   themeStore.hydrate();
-  await Promise.all([authStore.hydrate(), itemStore.hydrate(), exchangeStore.hydrate()]);
+  await Promise.all([authStore.hydrate(), itemStore.hydrate(), exchangeStore.hydrate(), notificationStore.hydrate()]);
 });
 </script>
