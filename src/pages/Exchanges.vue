@@ -76,6 +76,7 @@ const applyRouteQuery = () => {
   }
   if (qHighlight) {
     highlightId.value = qHighlight;
+    exchangeStore.statusFilter = 'all';
   }
 };
 

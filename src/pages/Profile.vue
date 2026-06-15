@@ -117,8 +117,8 @@ import ItemCard from '@/components/common/ItemCard.vue';
 import UserBrief from '@/components/common/UserBrief.vue';
 import { ItemStatus } from '@/constants/item';
 import { useAuth } from '@/hooks/useAuth';
-import { NotificationType } from '@/models/notification';
 import type { Notification } from '@/models/notification';
+import { useExchangeStore } from '@/stores/exchangeStore';
 import { useItemStore } from '@/stores/itemStore';
 import { useNotificationStore } from '@/stores/notificationStore';
 import { formatDate } from '@/utils/formatters';
@@ -126,6 +126,7 @@ import { formatDate } from '@/utils/formatters';
 const router = useRouter();
 const { currentUser, users, login, updateProfile } = useAuth();
 const itemStore = useItemStore();
+const exchangeStore = useExchangeStore();
 const notificationStore = useNotificationStore();
 const selectedUserId = ref('');
 
@@ -175,7 +176,10 @@ const handleNotifClick = async (notif: Notification) => {
   if (!notif.read) {
     await notificationStore.markRead(notif.id);
   }
-  const tab = notif.type === NotificationType.REQUEST_RECEIVED ? 'received' : 'sent';
+  const exchange = exchangeStore.exchanges.find((e) => e.id === notif.exchange_id);
+  const tab = exchange && currentUser.value && exchange.from_user_id === currentUser.value.id
+    ? 'sent'
+    : 'received';
   router.push({ name: 'exchanges', query: { tab, highlight: notif.exchange_id } });
 };
 
