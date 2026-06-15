@@ -117,6 +117,7 @@ import ItemCard from '@/components/common/ItemCard.vue';
 import UserBrief from '@/components/common/UserBrief.vue';
 import { ItemStatus } from '@/constants/item';
 import { useAuth } from '@/hooks/useAuth';
+import { NotificationType } from '@/models/notification';
 import type { Notification } from '@/models/notification';
 import { useItemStore } from '@/stores/itemStore';
 import { useNotificationStore } from '@/stores/notificationStore';
@@ -174,7 +175,8 @@ const handleNotifClick = async (notif: Notification) => {
   if (!notif.read) {
     await notificationStore.markRead(notif.id);
   }
-  router.push({ name: 'exchanges' });
+  const tab = notif.type === NotificationType.REQUEST_RECEIVED ? 'received' : 'sent';
+  router.push({ name: 'exchanges', query: { tab, highlight: notif.exchange_id } });
 };
 
 const save = async () => {

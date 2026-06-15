@@ -563,6 +563,12 @@ textarea {
 .exchange-card {
   display: grid;
   gap: 14px;
+  transition: box-shadow 300ms ease, border-color 300ms ease;
+}
+
+.exchange-card--highlight {
+  border-color: var(--rs-accent);
+  box-shadow: 0 0 0 2px color-mix(in oklch, var(--rs-accent), transparent 40%), 0 18px 34px rgb(42 50 33 / 12%);
 }
 
 .exchange-card__items {

@@ -28,7 +28,9 @@
     <div v-if="visibleExchanges.length" class="exchange-list">
       <ExchangeCard
         v-for="exchange in visibleExchanges"
+        :id="'exchange-' + exchange.id"
         :key="exchange.id"
+        :class="{ 'exchange-card--highlight': highlightId === exchange.id }"
         :exchange="exchange"
         :items="itemStore.items"
         :users="authStore.users"
@@ -47,7 +49,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 
 import EmptyState from '@/components/common/EmptyState.vue';
 import ExchangeCard from '@/components/common/ExchangeCard.vue';
@@ -58,10 +61,39 @@ import { useAuthStore } from '@/stores/authStore';
 import { useExchangeStore } from '@/stores/exchangeStore';
 import { useItemStore } from '@/stores/itemStore';
 
+const route = useRoute();
 const authStore = useAuthStore();
 const itemStore = useItemStore();
 const exchangeStore = useExchangeStore();
 const tab = ref<'sent' | 'received'>('sent');
+const highlightId = ref('');
+
+const applyRouteQuery = () => {
+  const qTab = route.query.tab as string;
+  const qHighlight = route.query.highlight as string;
+  if (qTab === 'received' || qTab === 'sent') {
+    tab.value = qTab;
+  }
+  if (qHighlight) {
+    highlightId.value = qHighlight;
+  }
+};
+
+watch(() => route.query, applyRouteQuery, { immediate: true });
+
+onMounted(() => {
+  if (highlightId.value) {
+    nextTick(() => {
+      const el = document.getElementById('exchange-' + highlightId.value);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      setTimeout(() => {
+        highlightId.value = '';
+      }, 3000);
+    });
+  }
+});
 
 const mine = computed(() => {
   if (!authStore.currentUser) return [];
